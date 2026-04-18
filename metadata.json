@@ -1,0 +1,5 @@
+{
+  "name": "Apollo Trail",
+  "description": "A retro Apollo mission survival game inspired by Oregon Trail. Manage resources, navigate space, and land on the moon.",
+  "requestFramePermissions": []
+}

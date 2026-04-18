@@ -1,0 +1,400 @@
+/* ============================================================
+   Apollo Mission — Stylesheet
+   ============================================================ */
+
+body {
+    margin: 0;
+    background-color: #000;
+}
+
+/* ---- CRT Scanlines + Flicker ---- */
+.crt-overlay {
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.18) 50%),
+        linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,255,0,0.015), rgba(0,0,255,0.04));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    z-index: 100;
+    animation: flicker 8s infinite;
+}
+
+.vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, transparent 45%, rgba(0,0,0,0.65) 130%);
+    pointer-events: none;
+    z-index: 90;
+}
+
+@keyframes flicker {
+    0%,100% { opacity: 0.98; }
+    2%       { opacity: 0.94; }
+    8%       { opacity: 0.96; }
+    30%      { opacity: 0.99; }
+    55%      { opacity: 0.95; }
+    70%      { opacity: 0.97; }
+    85%      { opacity: 0.93; }
+    92%      { opacity: 0.98; }
+}
+
+/* ============================================================
+   Instrument Panel Gauges
+   ============================================================ */
+
+.instrument-panel {
+    background: #1a1a1a;
+    border: 2px solid #2e2e2e;
+    border-bottom: 4px solid #111;
+    border-right:  4px solid #111;
+    border-top:    1px solid #444;
+    border-left:   1px solid #444;
+    border-radius: 3px;
+    padding: 10px 12px 8px;
+    position: relative;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        inset 0 -1px 0 rgba(0,0,0,0.5),
+        0 4px 12px rgba(0,0,0,0.7);
+    transition: box-shadow 0.3s;
+}
+
+/* Panel screws in corners */
+.instrument-panel::before,
+.instrument-panel::after {
+    content: '✕';
+    position: absolute;
+    font-size: 6px;
+    color: #444;
+    line-height: 1;
+}
+.instrument-panel::before { top: 4px;  left:  4px; }
+.instrument-panel::after  { bottom: 4px; right: 4px; }
+
+/* Critical flash */
+.panel-critical {
+    animation: panel-alert 0.6s infinite alternate;
+}
+@keyframes panel-alert {
+    from { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 12px rgba(0,0,0,0.7); }
+    to   { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,40,40,0.55), 0 4px 12px rgba(0,0,0,0.7); }
+}
+
+/* Panel header row */
+.ip-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.ip-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    flex: 1;
+}
+
+/* Status LED */
+.ip-led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: background 0.3s, box-shadow 0.3s;
+}
+.led-ok   { background: #00cc44; box-shadow: 0 0 5px #00cc44; }
+.led-warn { background: #ffaa00; box-shadow: 0 0 5px #ffaa00; animation: led-blink 1s infinite alternate; }
+.led-crit { background: #ff2222; box-shadow: 0 0 8px #ff2222; animation: led-blink 0.4s infinite alternate; }
+
+@keyframes led-blink {
+    from { opacity: 1; }
+    to   { opacity: 0.3; }
+}
+
+/* Gauge track */
+.gauge-track {
+    background: #070707;
+    border: 1px solid #2a2a2a;
+    border-top-color: #111;
+    border-left-color: #111;
+    padding: 3px 3px;
+    border-radius: 2px;
+}
+
+.gauge-segs {
+    display: flex;
+    gap: 2px;
+    height: 12px;
+}
+
+.seg {
+    flex: 1;
+    border-radius: 1px;
+    transition: background 0.25s, box-shadow 0.25s;
+}
+
+/* Lit segment colours */
+.seg-g {
+    background: #00ee44;
+    box-shadow: 0 0 5px rgba(0,238,68,0.7), 0 0 1px #00ee44 inset;
+}
+.seg-a {
+    background: #ffaa00;
+    box-shadow: 0 0 5px rgba(255,170,0,0.7), 0 0 1px #ffaa00 inset;
+    animation: amber-flicker 1.8s infinite;
+}
+.seg-r {
+    background: #ff2222;
+    box-shadow: 0 0 6px rgba(255,34,34,0.8), 0 0 1px #ff3333 inset;
+    animation: red-pulse 0.5s infinite alternate;
+}
+.seg-d {
+    background: #111;
+    box-shadow: none;
+}
+
+@keyframes amber-flicker {
+    0%,100% { opacity: 1; }
+    50%     { opacity: 0.85; }
+}
+@keyframes red-pulse {
+    from { opacity: 0.75; }
+    to   { opacity: 1;    }
+}
+
+/* Tick marks below gauge */
+.gauge-ticks {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 1px 0;
+}
+.gauge-tick-mark {
+    width: 1px;
+    height: 4px;
+    background: #333;
+}
+
+/* Gauge footer labels */
+.ip-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+}
+.ip-footer-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.05em;
+}
+
+/* Digital readout */
+.ip-readout {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #00ff88;
+    text-shadow: 0 0 6px rgba(0,255,136,0.6), 0 0 14px rgba(0,255,136,0.2);
+    background: #030303;
+    border: 1px solid #1a1a1a;
+    border-radius: 2px;
+    padding: 1px 5px;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   DSKY — Apollo Guidance Computer
+   ============================================================ */
+
+#dsky {
+    background: #1c1c1c;
+    border: 3px solid #2a2a2a;
+    border-top-color: #444;
+    border-left-color: #444;
+    border-bottom: 5px solid #0e0e0e;
+    border-right:  5px solid #0e0e0e;
+    border-radius: 6px;
+    padding: 14px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 8px 30px rgba(0,0,0,0.8);
+}
+
+/* DSKY EL display */
+.dsky-display {
+    background: #030a04;
+    border: 2px solid #111;
+    border-top-color: #0a1a0a;
+    border-left-color: #0a1a0a;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.dsky-reg-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.dsky-reg-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    font-weight: 700;
+    color: #33ff77;
+    text-shadow: 0 0 8px rgba(51,255,119,0.7), 0 0 20px rgba(51,255,119,0.25);
+    text-align: center;
+    letter-spacing: 0.1em;
+    line-height: 1;
+}
+
+.dsky-prog-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: #33ff77;
+    text-shadow: 0 0 8px rgba(51,255,119,0.7), 0 0 20px rgba(51,255,119,0.25);
+    text-align: center;
+}
+
+/* DSKY Warning Lights strip */
+.dsky-warning-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.warning-light {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 2px;
+    padding: 3px 5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.2s;
+}
+.warning-light.wl-on {
+    background: #1a1a00;
+}
+
+.wl-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    flex-shrink: 0;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+.warning-light.wl-on .wl-dot {
+    background: #ffee00;
+    box-shadow: 0 0 6px #ffee00, 0 0 12px rgba(255,238,0,0.5);
+}
+.warning-light[id="wl-prog"].wl-on .wl-dot  { background: #44ff88; box-shadow: 0 0 6px #44ff88; }
+.warning-light[id="wl-uplink"].wl-on .wl-dot { background: #44aaff; box-shadow: 0 0 6px #44aaff; }
+.warning-light[id="wl-opr"].wl-on .wl-dot   { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
+
+.wl-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+.warning-light.wl-on .wl-label { color: rgba(255,255,255,0.65); }
+
+/* DSKY Keypad buttons */
+.dsky-btn {
+    background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+    border: 1px solid #222;
+    border-bottom: 3px solid #111;
+    border-right:  3px solid #111;
+    border-top:    1px solid #555;
+    border-left:   1px solid #555;
+    color: #ddd;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 0;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.08s;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.dsky-btn:hover {
+    background: linear-gradient(180deg, #444 0%, #333 100%);
+    color: #fff;
+}
+
+.dsky-btn:active {
+    transform: translate(2px, 2px);
+    border-bottom: 1px solid #111;
+    border-right:  1px solid #111;
+    background: #1e1e1e;
+}
+
+/* ============================================================
+   Mission Info Bar
+   ============================================================ */
+#mission-info {
+    background: rgba(28,28,28,0.92);
+    border: 2px solid #1e1e1e;
+    border-top-color: #444;
+    border-left-color: #444;
+    border-bottom: 4px solid #0e0e0e;
+    border-right:  4px solid #0e0e0e;
+    padding: 8px 18px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #888;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+/* ============================================================
+   Scrollbar Hide
+   ============================================================ */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ============================================================
+   Decision Modal Polish
+   ============================================================ */
+#decision-modal .decision-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
+
+/* ============================================================
+   Overlay Polish
+   ============================================================ */
+#overlay .inner {
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 0 60px rgba(255,255,255,0.05);
+}
+
+/* ============================================================
+   General phosphor glow for green text
+   ============================================================ */
+.phosphor {
+    text-shadow: 0 0 6px currentColor;
+}
